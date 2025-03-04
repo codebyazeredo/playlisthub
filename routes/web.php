@@ -9,13 +9,8 @@ Route::get('/', function () {
     return view('auth.login');
 });
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified',])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::get('/playlists', [SpotifyController::class, 'showPlaylists'])->name('user.playlists');
-    Route::get('/profile', [SpotifyController::class, 'showUserInfo'])->name('user.profile');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [SpotifyController::class, 'showPlaylists'])->name('dashboard');
 });
 
 Route::get('auth/spotify', [SpotifyAuthController::class, 'redirectToSpotify']);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
 use App\Services\SpotifyService;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,18 +15,17 @@ class SpotifyController extends Controller
         $this->spotifyService = $spotifyService;
     }
 
-    public function showPlaylists()
+    public function showPlaylists(): View
     {
-        $user = Auth::user();
+        $playlists = $this->spotifyService->getUserPlaylists();
 
-        $playlists = $this->spotifyService->getUserPlaylists($user->spotify_access_token);
-
-        if (!$playlists) {
-            return redirect()->route('dashboard')->with('error', 'Falha ao buscar playlists.');
+        if (!$playlists || !isset($playlists['items'])) {
+            return view('dashboard', ['playlists' => []])->with('error', 'Nenhuma playlist encontrada.');
         }
 
-        return view('users.playlists', compact('playlists'));
+        return view('dashboard', compact('playlists'));
     }
+
 
     public function showUserInfo()
     {
