@@ -1,27 +1,54 @@
-@extends('layouts.app')
+<div class="container mt-4">
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
-@section('content')
-    <div class="container">
-        <h1>Minhas Playlists</h1>
+    @if(isset($playlists['items']) && count($playlists['items']) > 0)
+        <table class="table table-striped" id="table-playlists">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Imagem</th>
+                <th>Nome</th>
+                <th>Músicas</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($playlists['items'] as $index => $playlist)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>
+                        @if(isset($playlist['images'][0]['url']))
+                            <img src="{{ $playlist['images'][0]['url'] }}" alt="Playlist Image" width="50" height="50">
+                        @else
+                            <span>Sem imagem</span>
+                        @endif
+                    </td>
+                    <td>{{ $playlist['name'] }}</td>
+                    <td>{{ $playlist['tracks']['total'] ?? 0 }} Música(s)</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            @if(isset($playlist['external_urls']['spotify']))
+                                <a href="{{ $playlist['external_urls']['spotify'] }}" target="_blank" class="btn btn-success btn-sm d-flex align-items-center">
+                                    <i class="bi bi-spotify"></i>
+                                </a>
+                            @else
+                                <span>Sem link</span>
+                            @endif
 
-        @if(session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
-
-        @if($playlists && count($playlists['items']) > 0)
-            <ul class="list-group">
-                @foreach($playlists['items'] as $playlist)
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <img src="{{ $playlist['images'][0]['url'] ?? '' }}" alt="Playlist Image" width="50" height="50">
-                        <span>{{ $playlist['name'] }}</span>
-                        <a href="{{ $playlist['external_urls']['spotify'] }}" class="btn btn-primary" target="_blank">Abrir no Spotify</a>
-                    </li>
-                @endforeach
-            </ul>
-        @else
-            <p>Você ainda não tem playlists no Spotify.</p>
-        @endif
-    </div>
-@endsection
+                            <button class="btn btn-primary btn-sm d-flex align-items-center compartilhar-btn">
+                                <i class="bi bi-file-music-fill"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    @else
+        <p>Você ainda não tem playlists no Spotify.</p>
+    @endif
+</div>
