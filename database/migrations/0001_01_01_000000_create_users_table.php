@@ -18,9 +18,10 @@ return new class extends Migration
             $table->foreignId('current_team_id')->nullable();
             $table->string('profile_photo_path', 2048)->nullable();
 
-            // Campos do Spotify
             $table->string('spotify_id')->nullable()->unique();
             $table->string('spotify_avatar', 2048)->nullable();
+            $table->string('spotify_access_token')->nullable();
+            $table->string('spotify_refresh_token')->nullable();
 
             $table->timestamps();
         });
