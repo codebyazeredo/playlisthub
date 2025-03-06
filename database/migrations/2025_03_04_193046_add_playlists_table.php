@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('playlists', function (Blueprint $table) {
@@ -18,17 +15,14 @@ return new class extends Migration
             $table->string('name');
             $table->string('description')->nullable();
             $table->string('cover_url')->nullable();
-            $table->boolean('is_public')->default(false); // Define se está visível na home
+            $table->boolean('is_public')->default(false);
             $table->timestamps();
         });
 
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('playlists');
     }
 };
