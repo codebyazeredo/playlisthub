@@ -12,14 +12,12 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        @livewireStyles
     </head>
-    <body>
-        <div class="font-sans text-gray-900 antialiased">
+    <body class="font-sans antialiased bg-black">
+        <div class="font-sans text-gray-900 antialiased bg-dark">
             {{ $slot }}
         </div>
 
-        @livewireScripts
         @include('layouts.scripts')
         <script src="{{ asset('js/users/playlists.js') }}"></script>
     </body>
