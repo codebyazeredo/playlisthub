@@ -6,19 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::create('playlists', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('spotify_id')->unique();
+            $table->string('spotify_playlist_id')->unique()->after('id');
             $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('cover_url')->nullable();
-            $table->boolean('is_public')->default(false);
+            $table->text('description')->nullable();
+            $table->string('image_url')->nullable();
+            $table->integer('track_count')->default(0);
+            $table->string('external_url')->nullable();
+            $table->string('owner');
+            $table->foreignId('user_id')->constrained('users');
             $table->timestamps();
         });
-
     }
 
     public function down(): void

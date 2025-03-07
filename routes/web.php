@@ -17,3 +17,4 @@ Route::middleware(['auth'])->group(function () {
 Route::get('auth/spotify', [SpotifyAuthController::class, 'redirectToSpotify']);
 Route::get('auth/spotify/callback', [SpotifyAuthController::class, 'handleSpotifyCallback']);
 Route::post('/playlists/store', [PlaylistController::class, 'store'])->name('playlists.store');
+Route::post('spotify/store', [SpotifyController::class, 'store'])->name('spotify.store');
