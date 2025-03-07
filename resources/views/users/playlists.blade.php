@@ -5,19 +5,25 @@
         </div>
     @endif
 
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <form action="{{ route('playlists.store') }}" method="POST">
         @csrf
         <div class="mb-3">
-            <button type="submit" class="btn btn-primary">Enviar Playlists Selecionadas</button>
+            <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-share"></i> Compartilhar Playlists Selecionadas</button>
         </div>
 
         @if(isset($playlists['items']) && count($playlists['items']) > 0)
-            <table class="table table-striped" id="table-playlists">
+            <table class="table table-bordered table-hover align-middle justify-center" id="table-playlists">
                 <thead>
                 <tr>
                     <th><input type="checkbox" id="select-all" class="form-check-input"></th>
-                    <th>Imagem</th>
-                    <th>Nome</th>
+                    <th>Capa</th>
+                    <th colspan="2">Nome</th>
                     <th>Músicas</th>
                     <th>Ações</th>
                 </tr>
@@ -25,7 +31,7 @@
                 <tbody>
                 @foreach($playlists['items'] as $index => $playlist)
                     <tr>
-                        <td><input type="checkbox" name="selected_playlists[]" value="{{ $playlist['id'] }}" class="form-check-input"></td>
+                        <td><input type="checkbox" name="selected_playlists[]" value="{{ $playlist['id'] }}" class="form-check-input" disabled="{{ $playlist['compartilhado'] ? 'true' : '' }}"></td>
                         <td>
                             @if(isset($playlist['images'][0]['url']))
                                 <img src="{{ $playlist['images'][0]['url'] }}" alt="Playlist Image" width="50" height="50">
@@ -34,7 +40,20 @@
                             @endif
                         </td>
                         <td>{{ $playlist['name'] }}</td>
-                        <td>{{ $playlist['tracks']['total'] ?? 0 }} Música(s)</td>
+                        <td>
+                            @if($playlist['compartilhado'])
+                                <span><button class="btn btn-success btn-sm" disabled="true"><i class="bi bi-check-circle"></i> Já compartilhado</button></span>
+                            @else
+                                <span><button class="btn btn-warning btn-sm" disabled="true"><i class="bi bi-x-circle"></i> Não compartilhada</button></span>
+                            @endif
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-sm d-flex align-items-center compartilhar-btn">
+                                <span>
+                                    <i class="bi bi-file-music-fill"></i> {{ $playlist['tracks']['total'] ?? 0 }} Música(s)
+                                </span>
+                            </button>
+                        </td>
                         <td>
                             <div class="d-flex gap-2">
                                 @if(isset($playlist['external_urls']['spotify']))
@@ -44,10 +63,6 @@
                                 @else
                                     <span>Sem link</span>
                                 @endif
-
-                                <button class="btn btn-primary btn-sm d-flex align-items-center compartilhar-btn">
-                                    <i class="bi bi-file-music-fill"></i>
-                                </button>
                             </div>
                         </td>
                     </tr>
@@ -59,12 +74,3 @@
         @endif
     </form>
 </div>
-
-<script>
-    document.getElementById('select-all').addEventListener('change', function() {
-        let checkboxes = document.querySelectorAll('input[name="selected_playlists[]"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = this.checked;
-        });
-    });
-</script>

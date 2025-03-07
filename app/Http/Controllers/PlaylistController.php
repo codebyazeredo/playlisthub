@@ -3,20 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Models\Playlist;
+use App\Services\SpotifyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
+use Illuminate\View\View;
 
 class PlaylistController extends Controller
 {
+    protected $spotifyService;
+
+    public function __construct(SpotifyService $spotifyService)
+    {
+        $this->spotifyService = $spotifyService;
+    }
+
+    public function showPlaylists(): View
+    {
+        $playlists = $this->spotifyService->getUserPlaylists();
+
+        if (!$playlists || !isset($playlists['items'])) {
+            return view('dashboard', ['playlists' => []])->with('error', 'Nenhuma playlist encontrada.');
+        }
+
+        foreach ($playlists['items'] as &$playlist) {
+            $existe = Playlist::where('spotify_playlist_id', $playlist['id'])->where('user_id', Auth::id())->exists();
+            $playlist['compartilhado'] = $existe;
+
+            $tracks = $this->spotifyService->getPlaylistTracks($playlist['id']);
+            $playlist['tracks'] = $tracks ? $tracks['items'] : [];
+        }
+
+        dd($playlists);
+        return view('dashboard', compact('playlists'));
+    }
+
     public function store(Request $request)
     {
         $selectedPlaylists = $request->input('selected_playlists');
 
-
         foreach ($selectedPlaylists as $playlistId) {
-
-            $spotifyPlaylist = $this->getSpotifyPlaylistDetails($playlistId);
+            $spotifyPlaylist = $this->spotifyService->getPlaylistTracks($playlistId);
 
             if ($spotifyPlaylist) {
                 Playlist::updateOrCreate(
@@ -36,23 +62,19 @@ class PlaylistController extends Controller
             }
         }
 
-        return redirect()->route('dashboard')->with('success', 'Playlists selecionadas salvas com sucesso!');
+        return redirect()->route('dashboard')->with('success', 'Playlists selecionadas compartilhadas com sucesso!');
     }
 
-    private function getSpotifyPlaylistDetails($playlistId)
+    public function removePlaylist(Request $request)
     {
+        $selectedPlaylists = $request->input('selected_playlists');
 
-        $accessToken = Auth::user()->spotify_access_token;
-
-        if (!$accessToken) {
-            return null;
+        foreach ($selectedPlaylists as $playlistId) {
+            Playlist::where('spotify_playlist_id', $playlistId)
+                ->where('user_id', Auth::id())
+                ->delete();
         }
 
-        $response = Http::withToken($accessToken)->get("https://api.spotify.com/v1/playlists/{$playlistId}");
-        if ($response->successful()) {
-            return $response->json();
-        }
-
-        return null;
+        return redirect()->route('dashboard')->with('success', 'Playlist removida com sucesso!');
     }
 }

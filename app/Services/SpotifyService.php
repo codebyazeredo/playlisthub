@@ -42,4 +42,23 @@ class SpotifyService
 
         return null;
     }
+
+    public function getPlaylistTracks($playlistId)
+    {
+        $user = Auth::user();
+
+        if (!$user || !$user->spotify_access_token) {
+            return null;
+        }
+
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $user->spotify_access_token,
+        ])->get($this->baseUrl . "playlists/{$playlistId}/tracks");
+
+        if ($response->successful()) {
+            return $response->json();
+        }
+
+        return null;
+    }
 }
