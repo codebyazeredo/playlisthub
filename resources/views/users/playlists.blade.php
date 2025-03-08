@@ -48,9 +48,9 @@
                             @endif
                         </td>
                         <td>
-                            <button class="btn btn-primary btn-sm d-flex align-items-center compartilhar-btn">
+                            <button class="btn btn-primary btn-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#playlistModal{{ $playlist['id'] }}" onclick="event.preventDefault();">
                                 <span>
-                                    <i class="bi bi-file-music-fill"></i> {{ $playlist['tracks']['total'] ?? 0 }} Música(s)
+                                    <i class="bi bi-file-music-fill"></i> {{ count($playlist['tracks']) }} Música(s)
                                 </span>
                             </button>
                         </td>
@@ -66,6 +66,7 @@
                             </div>
                         </td>
                     </tr>
+                    @include('users.modal-playlist-tracks')
                 @endforeach
                 </tbody>
             </table>

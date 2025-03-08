@@ -30,10 +30,9 @@ class PlaylistController extends Controller
             $playlist['compartilhado'] = $existe;
 
             $tracks = $this->spotifyService->getPlaylistTracks($playlist['id']);
-            $playlist['tracks'] = $tracks ? $tracks['items'] : [];
+            $playlist['tracks'] = isset($tracks['items']) && is_array($tracks['items']) ? $tracks['items'] : [];
         }
 
-        dd($playlists);
         return view('dashboard', compact('playlists'));
     }
 
@@ -41,28 +40,28 @@ class PlaylistController extends Controller
     {
         $selectedPlaylists = $request->input('selected_playlists');
 
-        foreach ($selectedPlaylists as $playlistId) {
-            $spotifyPlaylist = $this->spotifyService->getPlaylistTracks($playlistId);
+        if (is_array($selectedPlaylists) && count($selectedPlaylists) > 0) {
+            foreach ($selectedPlaylists as $playlistId) {
+                $spotifyPlaylist = $this->spotifyService->getPlaylistTracks($playlistId);
 
-            if ($spotifyPlaylist) {
-                Playlist::updateOrCreate(
-                    [
-                        'spotify_playlist_id' => $playlistId,
-                        'user_id' => Auth::id(),
-                    ],
-                    [
-                        'name' => $spotifyPlaylist['name'],
-                        'description' => $spotifyPlaylist['description'] ?? 'Descrição não disponível',
-                        'image_url' => $spotifyPlaylist['images'][0]['url'] ?? null,
-                        'track_count' => $spotifyPlaylist['tracks']['total'],
-                        'external_url' => $spotifyPlaylist['external_urls']['spotify'],
-                        'owner' => $spotifyPlaylist['owner']['display_name'],
-                    ]
-                );
+                if ($spotifyPlaylist) {
+                    Playlist::updateOrCreate(
+                        [
+                            'spotify_playlist_id' => $playlistId,
+                            'user_id' => Auth::id(),
+                        ],
+                        [
+                            'name' => $spotifyPlaylist['name'],
+                            'description' => $spotifyPlaylist['description'] ?? 'Descrição não disponível',
+                        ]
+                    );
+                }
             }
-        }
 
-        return redirect()->route('dashboard')->with('success', 'Playlists selecionadas compartilhadas com sucesso!');
+            return redirect()->route('playlists.index')->with('success', 'Playlists adicionadas com sucesso!');
+        } else {
+            return redirect()->back()->with('error', 'Nenhuma playlist selecionada!');
+        }
     }
 
     public function removePlaylist(Request $request)
