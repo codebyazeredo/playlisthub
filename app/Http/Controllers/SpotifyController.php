@@ -4,19 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 
+
 class SpotifyController extends Controller
 {
-    public function showUserInfo()
+    public function showUserProfile()
     {
         $user = Auth::user();
 
-        $userInfo = $this->spotifyService->getUserInfo($user->spotify_access_token);
-
-        if (!$userInfo) {
-            return redirect()->route('dashboard')->with('error', 'Falha ao buscar informações do usuário.');
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Usuário não autenticado.');
         }
 
-        return view('users.profile', compact('userInfo'));
+        $playlists = (new \App\Services\SpotifyService)->getUserPlaylists();
+
+        return view('playlisthub.components.profile.show', compact('user', 'playlists'));
     }
 }
 

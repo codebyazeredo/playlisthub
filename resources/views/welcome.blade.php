@@ -20,6 +20,6 @@
         @endif
     </head>
     <body>
-        @livewire('spotify-login')
+
     </body>
 </html>

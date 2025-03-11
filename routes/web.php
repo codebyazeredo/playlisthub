@@ -32,3 +32,5 @@ Route::get('/entrar-como-convidado', function () {
 })->name('entrar-como-convidado');
 
 Route::post('/playlists/{playlist}/comment', [CommentController::class, 'store'])->name('comments.store');
+
+Route::get('/profile', [SpotifyController::class, 'showUserProfile'])->name('profile');

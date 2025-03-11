@@ -1,3 +1,0 @@
-<a href="/">
-   PlaylistHub
-</a>
