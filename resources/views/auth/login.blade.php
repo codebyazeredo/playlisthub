@@ -31,7 +31,7 @@
                         <span></span>
                     </div>
 
-                    <button class="btn btn-dark btn-sm" onclick="event.preventDefault(); window.location.href='{{ route('entrar-como-convidado') }}';" class="w-full">
+                    <button class="btn btn-warning btn-sm" onclick="event.preventDefault(); window.location.href='{{ route('entrar-como-convidado') }}';" class="w-full">
                         <i class="bi bi-person-walking"></i> {{ __('Entrar como Convidado') }}
                     </button>
                 </div>

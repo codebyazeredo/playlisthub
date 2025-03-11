@@ -11,30 +11,29 @@
         @include('layouts.links')
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-
-        @livewireStyles
     </head>
     <body class="font-sans antialiased bg-dark">
-        <x-banner />
+    <x-banner/>
 
-        <div class="min-h-screen bg-gray-100">
-            @livewire('navigation-menu')
+    <div class="min-h-screen bg-gray-100">
+        @include('playlisthub.navbar')
 
-            @if (isset($header))
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endif
+        <header class="bg-dark">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <h2 class="font-semibold text-xl text-white leading-tight">
+                    @yield('header')
+                </h2>
+            </div>
+        </header>
 
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
+        <main>
+            @yield('content')
+        </main>
+    </div>
 
-        @stack('modals')
-        @livewireScripts
-        @include('layouts.scripts')
+    @include('playlisthub.footer')
+
+    @stack('modals')
+    @include('layouts.scripts')
     </body>
 </html>
