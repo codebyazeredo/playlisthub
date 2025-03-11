@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PlaylistController;
 use App\Http\Controllers\SpotifyController;
 use Illuminate\Support\Facades\Route;
@@ -29,3 +30,5 @@ Route::post('spotify/store', [SpotifyController::class, 'store'])->name('spotify
 Route::get('/entrar-como-convidado', function () {
     return redirect()->route('welcome');
 })->name('entrar-como-convidado');
+
+Route::post('/playlists/{playlist}/comment', [CommentController::class, 'store'])->name('comments.store');

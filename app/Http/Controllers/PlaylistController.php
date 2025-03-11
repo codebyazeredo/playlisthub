@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Genre;
 use App\Models\Playlist;
 use App\Services\SpotifyService;
 use Illuminate\Http\Request;
@@ -20,6 +21,7 @@ class PlaylistController extends Controller
     public function showPlaylists(): View
     {
         $playlists = $this->spotifyService->getUserPlaylists();
+        $genres = Genre::all();
 
         if (!$playlists || !isset($playlists['items'])) {
             return view('dashboard', ['playlists' => []])->with('error', 'Nenhuma playlist encontrada.');
@@ -33,19 +35,20 @@ class PlaylistController extends Controller
             $playlist['tracks'] = isset($tracks['items']) && is_array($tracks['items']) ? $tracks['items'] : [];
         }
 
-        return view('dashboard', compact('playlists'));
+        return view('dashboard', compact('playlists', 'genres'));
     }
 
     public function store(Request $request)
     {
         $selectedPlaylists = $request->input('selected_playlists');
+        $genres = $request->input('genre'); // Array de gêneros
 
         if (is_array($selectedPlaylists) && count($selectedPlaylists) > 0) {
             foreach ($selectedPlaylists as $playlistId) {
                 $spotifyPlaylist = $this->spotifyService->getPlaylistTracks($playlistId);
 
                 if ($spotifyPlaylist) {
-                    Playlist::updateOrCreate(
+                    $playlist = Playlist::updateOrCreate(
                         [
                             'spotify_playlist_id' => $playlistId,
                             'user_id' => Auth::id(),
@@ -55,14 +58,20 @@ class PlaylistController extends Controller
                             'description' => $spotifyPlaylist['description'] ?? 'Descrição não disponível',
                         ]
                     );
+
+                    if (!empty($genres[$playlistId])) {
+                        $genreIds = Genre::whereIn('id', $genres[$playlistId])->pluck('id')->toArray();
+                        $playlist->genres()->sync($genreIds);
+                    }
                 }
             }
 
             return redirect()->route('playlists.index')->with('success', 'Playlists adicionadas com sucesso!');
-        } else {
-            return redirect()->back()->with('error', 'Nenhuma playlist selecionada!');
         }
+
+        return redirect()->back()->with('error', 'Nenhuma playlist selecionada!');
     }
+
 
     public function removePlaylist(Request $request)
     {

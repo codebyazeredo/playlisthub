@@ -32,4 +32,9 @@ class Playlist extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+    public function genres()
+    {
+        return $this->belongsToMany(Genre::class, 'genre_playlist');
+    }
 }
