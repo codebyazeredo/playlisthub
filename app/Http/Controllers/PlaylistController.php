@@ -28,7 +28,10 @@ class PlaylistController extends Controller
         }
 
         foreach ($playlists['items'] as &$playlist) {
-            $existe = Playlist::where('spotify_playlist_id', $playlist['id'])->where('user_id', Auth::id())->exists();
+            $existe = Playlist::where('spotify_playlist_id', $playlist['id'])
+                ->where('user_id', Auth::id())
+                ->exists();
+
             $playlist['compartilhado'] = $existe;
 
             $tracks = $this->spotifyService->getPlaylistTracks($playlist['id']);
@@ -40,38 +43,26 @@ class PlaylistController extends Controller
 
     public function store(Request $request)
     {
-        $selectedPlaylists = $request->input('selected_playlists');
-        $genres = $request->input('genre'); // Array de gêneros
+        $request->validate([
+            'playlist_id' => 'required|exists:playlists,id',
+            'genres' => 'required|array',
+            'genres.*' => 'exists:genres,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'observation' => 'nullable|string',
+        ]);
 
-        if (is_array($selectedPlaylists) && count($selectedPlaylists) > 0) {
-            foreach ($selectedPlaylists as $playlistId) {
-                $spotifyPlaylist = $this->spotifyService->getPlaylistTracks($playlistId);
+        $playlist = Playlist::find($request->playlist_id);
+        $playlist->genres()->sync($request->genres);
 
-                if ($spotifyPlaylist) {
-                    $playlist = Playlist::updateOrCreate(
-                        [
-                            'spotify_playlist_id' => $playlistId,
-                            'user_id' => Auth::id(),
-                        ],
-                        [
-                            'name' => $spotifyPlaylist['name'],
-                            'description' => $spotifyPlaylist['description'] ?? 'Descrição não disponível',
-                        ]
-                    );
+        $comment = new Comment();
+        $comment->user_id = auth()->id();
+        $comment->playlist_id = $playlist->id;
+        $comment->rating = $request->rating;
+        $comment->observation = $request->observation;
+        $comment->save();
 
-                    if (!empty($genres[$playlistId])) {
-                        $genreIds = Genre::whereIn('id', $genres[$playlistId])->pluck('id')->toArray();
-                        $playlist->genres()->sync($genreIds);
-                    }
-                }
-            }
-
-            return redirect()->route('playlists.index')->with('success', 'Playlists adicionadas com sucesso!');
-        }
-
-        return redirect()->back()->with('error', 'Nenhuma playlist selecionada!');
+        return redirect()->route('playlists.index')->with('success', 'Playlist compartilhada com sucesso!');
     }
-
 
     public function removePlaylist(Request $request)
     {

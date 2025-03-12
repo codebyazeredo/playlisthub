@@ -1,0 +1,77 @@
+.rating {
+    display: inline-block;
+    position: relative;
+}
+
+.rating input {
+    display: none;
+}
+
+.rating label {
+    font-size: 22px;
+    color: #666;
+    cursor: pointer;
+    float: right;
+    margin-right: 2px;
+}
+
+.rating label:before {
+    content: "★";
+}
+
+.rating > input:checked ~ label {
+    color: #ffa723;
+}
+
+.rating > input:checked + label:hover,
+.rating > input:checked + label:hover ~ label,
+.rating > input:checked ~ label:hover,
+.rating > input:checked ~ label:hover ~ label,
+.rating > label:hover ~ input:checked ~ label {
+    color: #e58e09;
+}
+
+.rating:not(:checked) > label:hover,
+.rating:not(:checked) > label:hover ~ label {
+    color: #ff9e0b;
+}
+
+textarea.form-control.bg-light {
+    background-color: #1F2937FF !important;
+    color: #fff !important;
+}
+
+textarea::placeholder {
+    color: #FFFFFF;
+}
+#genres select.form-control {
+    background-color: #1F2937FF !important;
+    color: #fff !important;
+}
+
+#genres select.form-control option {
+    background-color: #1F2937FF !important;
+    color: #ffffff !important;
+}
+
+.select2-container .select2-selection {
+    background-color: #1F2937FF !important;
+    color: #fff !important;
+    border-color: #070c0a !important;
+}
+
+.select2-container .select2-results__option {
+    background-color: #1F2937FF !important;
+    color: #ffffff !important;
+}
+
+.select2-container .select2-selection {
+    background-color: #1F2937FF !important;
+    color: #fff !important;
+    border-color: #ccc !important;
+}
+
+.select2-container .select2-results__option {
+    background-color: #1F2937FF !important;
+    color: #fff !important;
+}
